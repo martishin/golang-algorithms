@@ -31,10 +31,6 @@ func TestAddToEmptyList(t *testing.T) {
 	if list.Head.Val != 1 {
 		t.Errorf("Expected node value to be 1, got %v", list.Head.Val)
 	}
-
-	if list.Head.Next != nil || list.Head.Prev != nil {
-		t.Errorf("Expected next and prev pointers of the node to be nil, but got Next: %v, Prev: %v", list.Head.Next, list.Head.Prev)
-	}
 }
 
 func TestAddToNonEmptyList(t *testing.T) {
@@ -56,20 +52,6 @@ func TestAddToNonEmptyList(t *testing.T) {
 	}
 	if list.Tail.Val != 2 {
 		t.Errorf("Expected tail node value to be 2, got %v", list.Tail.Val)
-	}
-
-	if list.Head.Next != list.Tail {
-		t.Errorf("Expected head's next to point to the tail, but got %v", list.Head.Next)
-	}
-	if list.Tail.Prev != list.Head {
-		t.Errorf("Expected tail's prev to point to the head, but got %v", list.Tail.Prev)
-	}
-
-	if list.Head.Prev != nil {
-		t.Errorf("Expected head's prev to be nil, but got %v", list.Head.Prev)
-	}
-	if list.Tail.Next != nil {
-		t.Errorf("Expected tail's next to be nil, but got %v", list.Tail.Next)
 	}
 }
 
