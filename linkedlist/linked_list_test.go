@@ -10,56 +10,118 @@ import (
 func TestNew(t *testing.T) {
 	list := linkedlist.New[int]()
 
-	if list.Head != nil || list.Tail != nil {
-		t.Fatalf("Head and tail should be nil after initialization")
+	if list.Front != nil || list.Back != nil {
+		t.Fatalf("Front and tail should be nil after initialization")
 	}
 }
 
-func TestAddToEmptyList(t *testing.T) {
+func TestPushBackToEmptyList(t *testing.T) {
 	list := linkedlist.New[int]()
 
-	list.Add(1)
+	node := list.PushBack(1)
 
-	if list.Head == nil || list.Tail == nil {
+	if node == nil {
+		t.Fatalf("Expected node to be non-nil after adding a value")
+	}
+
+	if list.Front == nil || list.Back == nil {
 		t.Fatalf("Expected head and tail to be non-nil after adding a value")
 	}
 
-	if list.Head != list.Tail {
+	if list.Front != list.Back {
 		t.Fatalf("Expected head and tail to point to the same node for a single element list")
 	}
 
-	if list.Head.Val != 1 {
-		t.Errorf("Expected node value to be 1, got %v", list.Head.Val)
+	if list.Front.Val != 1 {
+		t.Errorf("Expected node value to be 1, got %v", list.Front.Val)
 	}
 }
 
-func TestAddToNonEmptyList(t *testing.T) {
+func TestPushBackToNonEmptyList(t *testing.T) {
 	list := linkedlist.New[int]()
 
-	list.Add(1)
-	list.Add(2)
+	list.PushBack(1)
+	list.PushBack(2)
 
-	if list.Head == nil || list.Tail == nil {
+	if list.Front == nil || list.Back == nil {
 		t.Fatalf("Expected head and tail to be non-nil after adding values")
 	}
 
-	if list.Head == list.Tail {
+	if list.Front == list.Back {
 		t.Fatalf("Expected head and tail to point to different nodes for a two element list")
 	}
 
-	if list.Head.Val != 1 {
-		t.Errorf("Expected head node value to be 1, got %v", list.Head.Val)
+	if list.Front.Val != 1 {
+		t.Errorf("Expected head node value to be 1, got %v", list.Front.Val)
 	}
-	if list.Tail.Val != 2 {
-		t.Errorf("Expected tail node value to be 2, got %v", list.Tail.Val)
+	if list.Back.Val != 2 {
+		t.Errorf("Expected tail node value to be 2, got %v", list.Back.Val)
+	}
+}
+
+func TestPushFrontToEmptyList(t *testing.T) {
+	list := linkedlist.New[int]()
+
+	node := list.PushFront(1)
+
+	if node == nil {
+		t.Fatalf("Expected node to be non-nil after adding a value")
+	}
+
+	if list.Front == nil || list.Back == nil {
+		t.Fatalf("Expected head and tail to be non-nil after adding a value")
+	}
+
+	if list.Front != list.Back {
+		t.Fatalf("Expected head and tail to point to the same node for a single element list")
+	}
+
+	if list.Front.Val != 1 {
+		t.Errorf("Expected node value to be 1, got %v", list.Front.Val)
+	}
+}
+
+func TestPushFrontToNonEmptyList(t *testing.T) {
+	list := linkedlist.New[int]()
+
+	list.PushFront(1)
+	list.PushFront(2)
+
+	if list.Front == nil || list.Back == nil {
+		t.Fatalf("Expected head and tail to be non-nil after adding values")
+	}
+
+	if list.Front == list.Back {
+		t.Fatalf("Expected head and tail to point to different nodes for a two element list")
+	}
+
+	if list.Front.Val != 2 {
+		t.Errorf("Expected head node value to be 2, got %v", list.Front.Val)
+	}
+	if list.Back.Val != 1 {
+		t.Errorf("Expected tail node value to be 1, got %v", list.Back.Val)
+	}
+}
+
+func TestInsertBefore(t *testing.T) {
+	list := linkedlist.New[int]()
+
+	node := list.PushBack(1)
+	list.InsertBefore(2, node)
+
+	if list.Front.Val != 2 {
+		t.Errorf("Expected head node value to be 2, got %v", list.Front.Val)
+	}
+	if list.Back.Val != 1 {
+		t.Errorf("Expected tail node value to be 1, got %v", list.Back.Val)
 	}
 }
 
 func TestGet(t *testing.T) {
 	list := linkedlist.New[int]()
 
-	list.Add(1)
-	list.Add(2)
+	list.PushBack(1)
+	list.PushBack(2)
 
 	node := list.Get(1)
 
@@ -75,9 +137,9 @@ func TestGet(t *testing.T) {
 func TestToSlice(t *testing.T) {
 	list := linkedlist.New[int]()
 
-	list.Add(1)
-	list.Add(2)
-	list.Add(3)
+	list.PushBack(1)
+	list.PushBack(2)
+	list.PushBack(3)
 
 	slice := list.ToSlice()
 
@@ -89,9 +151,9 @@ func TestToSlice(t *testing.T) {
 func TestReverse(t *testing.T) {
 	list := linkedlist.New[int]()
 
-	list.Add(1)
-	list.Add(2)
-	list.Add(3)
+	list.PushBack(1)
+	list.PushBack(2)
+	list.PushBack(3)
 
 	list.Reverse()
 

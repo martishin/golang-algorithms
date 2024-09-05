@@ -7,42 +7,75 @@ type Node[T comparable] struct {
 }
 
 type List[T comparable] struct {
-	Head *Node[T]
-	Tail *Node[T]
-	Size int
+	Front *Node[T]
+	Back  *Node[T]
+	Len   int
 }
 
 func New[T comparable]() *List[T] {
 	return &List[T]{
-		Head: nil,
-		Tail: nil,
-		Size: 0,
+		Front: nil,
+		Back:  nil,
+		Len:   0,
 	}
 }
 
-func (l *List[T]) Add(val T) {
-	if l.Tail != nil {
-		newNode := &Node[T]{
+func (l *List[T]) PushBack(val T) *Node[T] {
+	var newNode *Node[T]
+
+	if l.Back != nil {
+		newNode = &Node[T]{
 			Val:  val,
 			Next: nil,
-			Prev: l.Tail,
+			Prev: l.Back,
 		}
-		l.Tail.Next = newNode
-		l.Tail = newNode
+
+		l.Back.Next = newNode
+		l.Back = newNode
 	} else {
-		newNode := &Node[T]{
+		newNode = &Node[T]{
 			Val:  val,
 			Next: nil,
 			Prev: nil,
 		}
-		l.Head = newNode
-		l.Tail = newNode
+
+		l.Front = newNode
+		l.Back = newNode
 	}
-	l.Size++
+	l.Len++
+
+	return newNode
+}
+
+func (l *List[T]) PushFront(val T) *Node[T] {
+	var newNode *Node[T]
+
+	if l.Front != nil {
+		newNode = &Node[T]{
+			Val:  val,
+			Next: l.Front,
+			Prev: nil,
+		}
+
+		l.Front.Prev = newNode
+		l.Front = newNode
+	} else {
+		newNode = &Node[T]{
+			Val:  val,
+			Next: nil,
+			Prev: nil,
+		}
+
+		l.Front = newNode
+		l.Back = newNode
+	}
+	l.Len++
+
+	return newNode
 }
 
 func (l *List[T]) Find(val T) *Node[T] {
-	current := l.Head
+	current := l.Front
 	for current != nil {
 		if current.Val == val {
 			return current
@@ -58,23 +91,21 @@ func (l *List[T]) Contains(val T) bool {
 	return found != nil
 }
 
-func (l *List[T]) Remove(val T) bool {
-	found := l.Find(val)
-
-	if found != nil {
-		if found.Next != nil {
-			found.Next.Prev = found.Prev
+func (l *List[T]) Remove(node *Node[T]) bool {
+	if node != nil {
+		if node.Next != nil {
+			node.Next.Prev = node.Prev
 		} else {
-			l.Tail = found.Prev
+			l.Back = node.Prev
 		}
 
-		if found.Prev != nil {
-			found.Prev.Next = found.Next
+		if node.Prev != nil {
+			node.Prev.Next = node.Next
 		} else {
-			l.Head = found.Next
+			l.Front = node.Next
 		}
+		l.Len--
 
-		l.Size--
 		return true
 	}
 
@@ -82,9 +113,9 @@ func (l *List[T]) Remove(val T) bool {
 }
 
 func (l *List[T]) Reverse() {
-	current := l.Head
+	current := l.Front
 	var prev *Node[T]
-	l.Tail = l.Head
+	l.Back = l.Front
 
 	for current != nil {
 		next := current.Next
@@ -93,34 +124,59 @@ func (l *List[T]) Reverse() {
 		prev = current
 		current = next
 	}
-	l.Head = prev
+	l.Front = prev
 }
 
-func (l *List[T]) InsertAfter(targetVal T, newVal T) {
-	current := l.Find(targetVal)
-	if current != nil {
-		newNode := &Node[T]{
-			Val:  newVal,
-			Next: current.Next,
-			Prev: current,
-		}
-		if current.Next != nil {
-			current.Next.Prev = newNode
-		}
-		current.Next = newNode
-		if current == l.Tail {
-			l.Tail = newNode
-		}
+func (l *List[T]) InsertAfter(newVal T, node *Node[T]) *Node[T] {
+	if node == nil {
+		return nil
 	}
+
+	newNode := &Node[T]{
+		Val:  newVal,
+		Next: node.Next,
+		Prev: node,
+	}
+	if node.Next != nil {
+		node.Next.Prev = newNode
+	} else {
+		l.Back = newNode
+	}
+	node.Next = newNode
+	l.Len++
+
+	return newNode
+}
+
+func (l *List[T]) InsertBefore(newVal T, node *Node[T]) *Node[T] {
+	if node == nil {
+		return nil
+	}
+
+	newNode := &Node[T]{
+		Val:  newVal,
+		Next: node,
+		Prev: node.Prev,
+	}
+	if node.Prev != nil {
+		node.Prev.Next = newNode
+	} else {
+		l.Front = newNode
+	}
+	node.Prev = newNode
+	l.Len++
+
+	return newNode
 }
 
 func (l *List[T]) Clear() {
-	l.Head = nil
-	l.Tail = nil
+	l.Front = nil
+	l.Back = nil
+	l.Len = 0
 }
 
 func (l *List[T]) Traverse(f func(T)) {
-	current := l.Head
+	current := l.Front
 	for current != nil {
 		f(current.Val)
 		current = current.Next
@@ -136,7 +192,7 @@ func (l *List[T]) ToSlice() []T {
 }
 
 func (l *List[T]) Get(index int) *Node[T] {
-	current := l.Head
+	current := l.Front
 
 	for range index {
 		if current == nil {
